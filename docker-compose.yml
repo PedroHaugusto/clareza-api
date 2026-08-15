@@ -29,6 +29,9 @@ services:
       DATABASE_URL: jdbc:postgresql://db:5432/clareza
       DATABASE_USER: clareza
       DATABASE_PASSWORD: clareza
+      # Valor de desenvolvimento. Em producao vem do painel do Render, nunca daqui.
+      JWT_SECRET: ${JWT_SECRET:-segredo-apenas-de-desenvolvimento-local-troque-em-producao}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-60}
     ports:
       - "8080:8080"
     restart: unless-stopped

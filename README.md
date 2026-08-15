@@ -54,12 +54,31 @@ Para conferir se subiu:
 curl http://localhost:8080/actuator/health   # {"status":"UP"}
 ```
 
-> Enquanto a configuração de segurança não existir (Bloco 3), o `/actuator/health` é público,
-> mas todo o resto responde **401**. Para acessar, use o usuário `user` com a senha que aparece
-> no log da aplicação como `Using generated security password: ...`.
-
 O CORS libera `http://localhost:4200` por padrão, e só nas rotas `/api/**`. Para liberar outras
 origens, use `CORS_ALLOWED_ORIGINS` com a lista separada por vírgula.
+
+## Autenticação
+
+`/actuator/health` e as rotas `/api/auth/**` são públicas. Todo o resto exige um JWT emitido
+pela própria API, enviado em `Authorization: Bearer <token>`.
+
+```bash
+# cria a conta e ja devolve o token
+curl -X POST http://localhost:8080/api/auth/registrar \
+  -H "Content-Type: application/json" \
+  -d '{"nome":"Ana","email":"ana@clareza.dev","senha":"senha-secreta"}'
+
+# login posterior
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"ana@clareza.dev","senha":"senha-secreta"}'
+```
+
+O token expira em `JWT_EXPIRATION_MINUTES` (60 por padrão) e é assinado com `JWT_SECRET`, que
+precisa de no mínimo 32 caracteres. Trocar o segredo invalida todos os tokens já emitidos.
+
+> A aplicação ainda registra `Using generated security password: ...` no boot. Essa senha não
+> serve para nada: não há basic auth nem formulário de login na cadeia de filtros, só o JWT.
 
 ## Testes
 

@@ -1,5 +1,6 @@
 package com.clareza.infrastructure.adapter.in.web;
 
+import com.clareza.domain.exception.CredenciaisInvalidasException;
 import com.clareza.domain.exception.RecursoNaoEncontradoException;
 import com.clareza.domain.exception.RegraDeNegocioException;
 import com.clareza.infrastructure.adapter.in.web.dto.RespostaErro;
@@ -72,6 +73,12 @@ public class TratadorDeErros {
     public ResponseEntity<RespostaErro> tratarRecursoNaoEncontrado(RecursoNaoEncontradoException excecao,
                                                                     HttpServletRequest requisicao) {
         return montar(HttpStatus.NOT_FOUND, excecao.getMessage(), requisicao, null);
+    }
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    public ResponseEntity<RespostaErro> tratarCredenciaisInvalidas(CredenciaisInvalidasException excecao,
+                                                                    HttpServletRequest requisicao) {
+        return montar(HttpStatus.UNAUTHORIZED, excecao.getMessage(), requisicao, null);
     }
 
     @ExceptionHandler(RegraDeNegocioException.class)

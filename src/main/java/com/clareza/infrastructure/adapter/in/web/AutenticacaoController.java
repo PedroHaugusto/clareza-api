@@ -1,0 +1,41 @@
+package com.clareza.infrastructure.adapter.in.web;
+
+import com.clareza.application.port.in.AutenticarUsuarioUseCase;
+import com.clareza.application.port.in.ComandoDeLogin;
+import com.clareza.application.port.in.ComandoDeRegistro;
+import com.clareza.application.port.in.RegistrarUsuarioUseCase;
+import com.clareza.infrastructure.adapter.in.web.dto.RequisicaoDeLogin;
+import com.clareza.infrastructure.adapter.in.web.dto.RequisicaoDeRegistro;
+import com.clareza.infrastructure.adapter.in.web.dto.RespostaAutenticacao;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.validation.Valid;
+
+@RestController
+@RequestMapping("/api/auth")
+@RequiredArgsConstructor
+public class AutenticacaoController {
+
+    private final RegistrarUsuarioUseCase registrarUsuario;
+    private final AutenticarUsuarioUseCase autenticarUsuario;
+
+    @PostMapping("/registrar")
+    @ResponseStatus(HttpStatus.CREATED)
+    public RespostaAutenticacao registrar(@Valid @RequestBody RequisicaoDeRegistro requisicao) {
+        ComandoDeRegistro comando = new ComandoDeRegistro(
+                requisicao.getNome(), requisicao.getEmail(), requisicao.getSenha());
+        return RespostaAutenticacao.de(registrarUsuario.registrar(comando));
+    }
+
+    @PostMapping("/login")
+    public RespostaAutenticacao login(@Valid @RequestBody RequisicaoDeLogin requisicao) {
+        ComandoDeLogin comando = new ComandoDeLogin(requisicao.getEmail(), requisicao.getSenha());
+        return RespostaAutenticacao.de(autenticarUsuario.autenticar(comando));
+    }
+}
