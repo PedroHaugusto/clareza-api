@@ -1,0 +1,26 @@
+# Maven
+target/
+# baixado sob demanda pelo mvnw — nao versionar binario
+.mvn/wrapper/maven-wrapper.jar
+
+# Ambiente
+.env
+
+# IDEs
+.idea/
+*.iml
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Agents
+AGENTS.md
