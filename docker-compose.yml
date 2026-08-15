@@ -1,0 +1,37 @@
+services:
+  db:
+    # Versao fixada: o Flyway 9.x recusa a conexao com PostgreSQL 17 ou mais novo.
+    image: postgres:16-alpine
+    container_name: clareza-db
+    environment:
+      POSTGRES_DB: clareza
+      POSTGRES_USER: clareza
+      POSTGRES_PASSWORD: clareza
+    ports:
+      - "5432:5432"
+    volumes:
+      - clareza-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U clareza -d clareza"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: .
+    container_name: clareza-api
+    # Sem o service_healthy a API sobe antes do Postgres aceitar conexao e o Flyway falha no boot.
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: jdbc:postgresql://db:5432/clareza
+      DATABASE_USER: clareza
+      DATABASE_PASSWORD: clareza
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  clareza-pgdata:

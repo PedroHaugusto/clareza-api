@@ -1,0 +1,30 @@
+# Build local — nao deve contaminar o build da imagem
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+# Controle de versao
+.git/
+.gitignore
+.gitattributes
+
+# IDEs
+.idea/
+*.iml
+*.iws
+.vscode/
+.settings/
+.project
+.classpath
+
+# Ambiente e documentacao
+.env
+.env.example
+AGENTS.md
+README.md
+docker-compose.yml
+Dockerfile
+
+# Logs e sistema
+*.log
+.DS_Store
+Thumbs.db
