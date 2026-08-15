@@ -77,6 +77,23 @@ curl -X POST http://localhost:8080/api/auth/login \
 O token expira em `JWT_EXPIRATION_MINUTES` (60 por padrão) e é assinado com `JWT_SECRET`, que
 precisa de no mínimo 32 caracteres. Trocar o segredo invalida todos os tokens já emitidos.
 
+### Login com Google
+
+O frontend obtém o `id_token` pelo Google Identity Services e o envia para a API, que confere a
+assinatura contra as chaves públicas do Google e devolve o JWT da própria aplicação:
+
+```bash
+curl -X POST http://localhost:8080/api/auth/google \
+  -H "Content-Type: application/json" \
+  -d '{"idToken":"<id_token do Google>"}'
+```
+
+Primeiro acesso cria a conta sem senha. Se o e-mail já tiver cadastro com senha, a conta recebe
+o vínculo com o Google e passa a aceitar os dois caminhos de login.
+
+Depende de `GOOGLE_CLIENT_ID`. Sem essa variável o endpoint responde 401 avisando que o login
+social não está configurado — os demais endpoints continuam funcionando normalmente.
+
 > A aplicação ainda registra `Using generated security password: ...` no boot. Essa senha não
 > serve para nada: não há basic auth nem formulário de login na cadeia de filtros, só o JWT.
 
@@ -92,6 +109,6 @@ rodando. O `pom.xml` fixa `api.version=1.43` no surefire: o Testcontainers 1.19.
 
 ## Status
 
-Bloco 1 concluído — ambiente local em Docker, configuração da aplicação e primeiro teste de
-integração funcionando. Próximo: Bloco 2 (tratamento de erro centralizado, CORS e formato
-padrão de resposta).
+Blocos 1 a 3 concluídos: ambiente em Docker, tratamento de erro centralizado, CORS e
+autenticação (registro, login por senha e login com Google, todos emitindo JWT próprio).
+Próximo: Bloco 4 (categorias e contas/cartões).

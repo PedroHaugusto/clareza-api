@@ -32,6 +32,8 @@ services:
       # Valor de desenvolvimento. Em producao vem do painel do Render, nunca daqui.
       JWT_SECRET: ${JWT_SECRET:-segredo-apenas-de-desenvolvimento-local-troque-em-producao}
       JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-60}
+      # Vazio desliga o login social: /api/auth/google responde 401 explicando o motivo.
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
     ports:
       - "8080:8080"
     restart: unless-stopped

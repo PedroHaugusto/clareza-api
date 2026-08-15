@@ -39,6 +39,10 @@ clareza:
     segredo: ${JWT_SECRET:segredo-apenas-de-desenvolvimento-local-troque-em-producao}
     expiracao-minutos: ${JWT_EXPIRATION_MINUTES:60}
 
+  google:
+    # Sem isso o /api/auth/google responde 401 explicando que o login social nao esta configurado.
+    client-id: ${GOOGLE_CLIENT_ID:}
+
   cors:
     # Lista separada por virgula. Em producao, a origem do frontend na Vercel/Cloudflare Pages.
     origens-permitidas: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}

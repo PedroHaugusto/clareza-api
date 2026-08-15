@@ -1,10 +1,13 @@
 package com.clareza.infrastructure.adapter.in.web;
 
+import com.clareza.application.port.in.AutenticarComGoogleUseCase;
 import com.clareza.application.port.in.AutenticarUsuarioUseCase;
 import com.clareza.application.port.in.ComandoDeLogin;
+import com.clareza.application.port.in.ComandoDeLoginComGoogle;
 import com.clareza.application.port.in.ComandoDeRegistro;
 import com.clareza.application.port.in.RegistrarUsuarioUseCase;
 import com.clareza.infrastructure.adapter.in.web.dto.RequisicaoDeLogin;
+import com.clareza.infrastructure.adapter.in.web.dto.RequisicaoDeLoginComGoogle;
 import com.clareza.infrastructure.adapter.in.web.dto.RequisicaoDeRegistro;
 import com.clareza.infrastructure.adapter.in.web.dto.RespostaAutenticacao;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ public class AutenticacaoController {
 
     private final RegistrarUsuarioUseCase registrarUsuario;
     private final AutenticarUsuarioUseCase autenticarUsuario;
+    private final AutenticarComGoogleUseCase autenticarComGoogle;
 
     @PostMapping("/registrar")
     @ResponseStatus(HttpStatus.CREATED)
@@ -37,5 +41,11 @@ public class AutenticacaoController {
     public RespostaAutenticacao login(@Valid @RequestBody RequisicaoDeLogin requisicao) {
         ComandoDeLogin comando = new ComandoDeLogin(requisicao.getEmail(), requisicao.getSenha());
         return RespostaAutenticacao.de(autenticarUsuario.autenticar(comando));
+    }
+
+    @PostMapping("/google")
+    public RespostaAutenticacao loginComGoogle(@Valid @RequestBody RequisicaoDeLoginComGoogle requisicao) {
+        ComandoDeLoginComGoogle comando = new ComandoDeLoginComGoogle(requisicao.getIdToken());
+        return RespostaAutenticacao.de(autenticarComGoogle.autenticar(comando));
     }
 }
