@@ -138,7 +138,7 @@ class AutenticacaoControllerTest extends TesteDeIntegracao {
         String token = json.get("token").asText();
 
         mockMvc.perform(get("/api/transacoes").header("Authorization", "Bearer " + token))
-                .andExpect(status().isNotFound());
+                .andExpect(status().isOk());
     }
 
     @Test
