@@ -2,6 +2,7 @@ package com.clareza.application.port.out;
 
 import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.domain.model.IntervaloDeDatas;
+import com.clareza.domain.model.TotalMensal;
 import com.clareza.domain.model.Transacao;
 
 import java.time.LocalDate;
@@ -17,6 +18,8 @@ public interface TransacaoRepositoryPort {
     List<Transacao> listarPorIntervalo(Long usuarioId, LocalDate inicio, LocalDate fim);
 
     List<Transacao> listarPrevistasAte(Long usuarioId, LocalDate limite);
+
+    List<TotalMensal> totalizarPorMesAte(Long usuarioId, LocalDate limite);
 
     Optional<Transacao> buscarPorId(Long id);
 

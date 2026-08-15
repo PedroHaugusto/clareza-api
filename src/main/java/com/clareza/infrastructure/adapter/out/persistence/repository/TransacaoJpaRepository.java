@@ -1,6 +1,7 @@
 package com.clareza.infrastructure.adapter.out.persistence.repository;
 
 import com.clareza.domain.model.StatusTransacao;
+import com.clareza.domain.model.TotalMensal;
 import com.clareza.infrastructure.adapter.out.persistence.entity.TransacaoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -29,6 +30,14 @@ public interface TransacaoJpaRepository
 
     List<TransacaoEntity> findByUsuarioIdAndStatusAndDataPrevistaLessThanEqualOrderByDataPrevistaAscIdAsc(
             Long usuarioId, StatusTransacao status, LocalDate limite);
+
+    @Query("SELECT new com.clareza.domain.model.TotalMensal("
+            + "  YEAR(t.dataPrevista), MONTH(t.dataPrevista), t.tipo, t.status, SUM(t.valor)) "
+            + "FROM TransacaoEntity t "
+            + "WHERE t.usuarioId = :usuarioId AND t.dataPrevista <= :limite "
+            + "GROUP BY YEAR(t.dataPrevista), MONTH(t.dataPrevista), t.tipo, t.status")
+    List<TotalMensal> totalizarPorMesAte(@Param("usuarioId") Long usuarioId,
+                                         @Param("limite") LocalDate limite);
 
     boolean existsByContaId(Long contaId);
 

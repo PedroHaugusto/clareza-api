@@ -4,6 +4,7 @@ import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.model.IntervaloDeDatas;
 import com.clareza.domain.model.StatusTransacao;
+import com.clareza.domain.model.TotalMensal;
 import com.clareza.domain.model.Transacao;
 import com.clareza.infrastructure.adapter.out.persistence.entity.TransacaoEntity;
 import com.clareza.infrastructure.adapter.out.persistence.mapper.TransacaoPersistenceMapper;
@@ -49,6 +50,11 @@ public class TransacaoPersistenceAdapter implements TransacaoRepositoryPort {
         return mapper.paraDominio(
                 repository.findByUsuarioIdAndStatusAndDataPrevistaLessThanEqualOrderByDataPrevistaAscIdAsc(
                         usuarioId, StatusTransacao.PREVISTA, limite));
+    }
+
+    @Override
+    public List<TotalMensal> totalizarPorMesAte(Long usuarioId, LocalDate limite) {
+        return repository.totalizarPorMesAte(usuarioId, limite);
     }
 
     @Override
