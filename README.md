@@ -113,4 +113,5 @@ Blocos 1 a 6 concluídos: ambiente em Docker, tratamento de erro centralizado, C
 autenticação (registro, login por senha e login com Google, todos emitindo JWT próprio),
 cadastro de categorias e contas/cartões, lançamentos com filtros combináveis e confirmação, e
 os lançamentos parcelados e recorrentes, o calendário mensal com alertas de vencimento e a
-visão geral com saldo e projeção dos próximos meses. Próximo: Bloco 9 (previsão e cenários).
+visão geral com saldo e projeção dos próximos meses, além da previsão com cenários e do fluxo
+de caixa. Próximo: Bloco 10 (investimentos e meta de aporte).
