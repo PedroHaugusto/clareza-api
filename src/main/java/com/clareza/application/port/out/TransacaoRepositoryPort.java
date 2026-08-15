@@ -4,6 +4,7 @@ import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.domain.model.IntervaloDeDatas;
 import com.clareza.domain.model.Transacao;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +21,8 @@ public interface TransacaoRepositoryPort {
     List<Transacao> salvarTodas(List<Transacao> transacoes);
 
     void excluir(Long id);
+
+    int excluirFuturasNaoConfirmadasDaRecorrencia(Long transacaoRecorrenteId, LocalDate apartirDe);
 
     boolean existeComConta(Long contaId);
 

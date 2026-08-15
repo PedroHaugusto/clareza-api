@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,6 +57,11 @@ public class TransacaoPersistenceAdapter implements TransacaoRepositoryPort {
     @Override
     public void excluir(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public int excluirFuturasNaoConfirmadasDaRecorrencia(Long transacaoRecorrenteId, LocalDate apartirDe) {
+        return repository.excluirFuturasNaoConfirmadas(transacaoRecorrenteId, apartirDe);
     }
 
     @Override
