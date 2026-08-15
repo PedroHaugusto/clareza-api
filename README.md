@@ -58,6 +58,9 @@ curl http://localhost:8080/actuator/health   # {"status":"UP"}
 > mas todo o resto responde **401**. Para acessar, use o usuário `user` com a senha que aparece
 > no log da aplicação como `Using generated security password: ...`.
 
+O CORS libera `http://localhost:4200` por padrão, e só nas rotas `/api/**`. Para liberar outras
+origens, use `CORS_ALLOWED_ORIGINS` com a lista separada por vírgula.
+
 ## Testes
 
 ```bash
