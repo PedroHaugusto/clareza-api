@@ -81,6 +81,16 @@ public class Transacao {
         return status == StatusTransacao.CONFIRMADA;
     }
 
+    public Transacao confirmarEm(LocalDate dataEfetivacao) {
+        exigir(!estaConfirmada(), "Esta transacao ja foi confirmada");
+        exigir(dataEfetivacao != null, "A data de efetivacao e obrigatoria para confirmar");
+
+        return toBuilder()
+                .status(StatusTransacao.CONFIRMADA)
+                .dataEfetivacao(dataEfetivacao)
+                .build();
+    }
+
     public boolean ehParcelada() {
         return grupoParcelamentoId != null;
     }

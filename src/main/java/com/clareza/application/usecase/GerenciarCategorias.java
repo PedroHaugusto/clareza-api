@@ -3,6 +3,7 @@ package com.clareza.application.usecase;
 import com.clareza.application.port.in.ComandoDeCriacaoDeCategoria;
 import com.clareza.application.port.in.GerenciarCategoriasUseCase;
 import com.clareza.application.port.out.CategoriaRepositoryPort;
+import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.exception.RecursoNaoEncontradoException;
 import com.clareza.domain.exception.RegraDeNegocioException;
 import com.clareza.domain.model.Categoria;
@@ -17,6 +18,7 @@ import java.util.List;
 public class GerenciarCategorias implements GerenciarCategoriasUseCase {
 
     private final CategoriaRepositoryPort categoriaRepository;
+    private final TransacaoRepositoryPort transacaoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -51,6 +53,11 @@ public class GerenciarCategorias implements GerenciarCategoriasUseCase {
 
         if (!categoria.pertenceA(usuarioId)) {
             throw new RecursoNaoEncontradoException("Categoria", categoriaId);
+        }
+
+        if (transacaoRepository.existeComCategoria(categoriaId)) {
+            throw new RegraDeNegocioException(
+                    "Esta categoria tem lancamentos e nao pode ser excluida");
         }
 
         categoriaRepository.excluir(categoriaId);

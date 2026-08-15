@@ -109,6 +109,7 @@ rodando. O `pom.xml` fixa `api.version=1.43` no surefire: o Testcontainers 1.19.
 
 ## Status
 
-Blocos 1 a 4 concluídos: ambiente em Docker, tratamento de erro centralizado, CORS,
-autenticação (registro, login por senha e login com Google, todos emitindo JWT próprio) e o
-cadastro de categorias e contas/cartões. Próximo: Bloco 5 (lançamentos).
+Blocos 1 a 5 concluídos: ambiente em Docker, tratamento de erro centralizado, CORS,
+autenticação (registro, login por senha e login com Google, todos emitindo JWT próprio),
+cadastro de categorias e contas/cartões e os lançamentos, com filtros combináveis e
+confirmação. Próximo: Bloco 6 (recorrência e parcelamento).

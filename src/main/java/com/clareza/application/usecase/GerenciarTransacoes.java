@@ -1,6 +1,7 @@
 package com.clareza.application.usecase;
 
 import com.clareza.application.port.in.ComandoDeTransacao;
+import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.application.port.in.GerenciarTransacoesUseCase;
 import com.clareza.application.port.out.CategoriaRepositoryPort;
 import com.clareza.application.port.out.ContaRepositoryPort;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -26,8 +28,16 @@ public class GerenciarTransacoes implements GerenciarTransacoesUseCase {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Transacao> listar(Long usuarioId) {
-        return transacaoRepository.listarDoUsuario(usuarioId);
+    public List<Transacao> listar(FiltroDeTransacoes filtro) {
+        return transacaoRepository.listarComFiltro(
+                filtro, filtro.getPeriodo().intervaloA(LocalDate.now()));
+    }
+
+    @Override
+    @Transactional
+    public Transacao confirmar(Long transacaoId, Long usuarioId) {
+        Transacao transacao = buscarDoUsuario(transacaoId, usuarioId);
+        return transacaoRepository.salvar(transacao.confirmarEm(LocalDate.now()));
     }
 
     @Override

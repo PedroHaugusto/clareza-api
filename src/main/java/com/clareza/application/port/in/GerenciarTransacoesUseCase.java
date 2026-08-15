@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface GerenciarTransacoesUseCase {
 
-    List<Transacao> listar(Long usuarioId);
+    List<Transacao> listar(FiltroDeTransacoes filtro);
+
+    Transacao confirmar(Long transacaoId, Long usuarioId);
 
     Transacao criar(ComandoDeTransacao comando);
 

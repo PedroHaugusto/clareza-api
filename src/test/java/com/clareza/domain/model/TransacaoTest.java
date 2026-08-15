@@ -101,6 +101,26 @@ class TransacaoTest {
     }
 
     @Test
+    @DisplayName("confirmar registra a data e muda o status")
+    void deveConfirmar() {
+        Transacao confirmada = prevista(HOJE.minusDays(2)).confirmarEm(HOJE);
+
+        assertThat(confirmada.getStatus()).isEqualTo(StatusTransacao.CONFIRMADA);
+        assertThat(confirmada.getDataEfetivacao()).isEqualTo(HOJE);
+        assertThat(confirmada.statusEm(HOJE)).isEqualTo(StatusTransacao.CONFIRMADA);
+    }
+
+    @Test
+    @DisplayName("confirmar duas vezes e recusado, para nao reescrever a data de efetivacao")
+    void deveRecusarConfirmacaoRepetida() {
+        Transacao confirmada = prevista(HOJE).confirmarEm(HOJE);
+
+        assertThatThrownBy(() -> confirmada.confirmarEm(HOJE.plusDays(1)))
+                .isInstanceOf(RegraDeNegocioException.class)
+                .hasMessageContaining("ja foi confirmada");
+    }
+
+    @Test
     @DisplayName("transacao sem grupo de parcelamento nao e parcelada")
     void deveIdentificarTransacaoAvulsa() {
         assertThat(prevista(HOJE).ehParcelada()).isFalse();

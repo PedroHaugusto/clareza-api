@@ -2,6 +2,7 @@ package com.clareza.application.usecase;
 
 import com.clareza.application.port.in.ComandoDeCriacaoDeConta;
 import com.clareza.application.port.out.ContaRepositoryPort;
+import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.exception.RecursoNaoEncontradoException;
 import com.clareza.domain.exception.RegraDeNegocioException;
 import com.clareza.domain.model.Conta;
@@ -29,6 +30,9 @@ class GerenciarContasTest {
 
     @Mock
     private ContaRepositoryPort contaRepository;
+
+    @Mock
+    private TransacaoRepositoryPort transacaoRepository;
 
     @InjectMocks
     private GerenciarContas gerenciarContas;
@@ -84,15 +88,31 @@ class GerenciarContasTest {
     }
 
     @Test
-    @DisplayName("conta propria e excluida")
+    @DisplayName("conta propria e sem lancamentos e excluida")
     void deveExcluirContaDoProprioUsuario() {
         Conta propria = Conta.builder()
                 .id(9L).usuarioId(1L).nome("Nubank").tipo(TipoConta.CARTAO_CREDITO).build();
         when(contaRepository.buscarPorId(9L)).thenReturn(Optional.of(propria));
+        when(transacaoRepository.existeComConta(9L)).thenReturn(false);
 
         gerenciarContas.excluir(9L, 1L);
 
         verify(contaRepository).excluir(9L);
+    }
+
+    @Test
+    @DisplayName("conta com lancamentos responde 422 em vez de estourar a chave estrangeira")
+    void deveRecusarExclusaoDeContaEmUso() {
+        Conta propria = Conta.builder()
+                .id(9L).usuarioId(1L).nome("Nubank").tipo(TipoConta.CARTAO_CREDITO).build();
+        when(contaRepository.buscarPorId(9L)).thenReturn(Optional.of(propria));
+        when(transacaoRepository.existeComConta(9L)).thenReturn(true);
+
+        assertThatThrownBy(() -> gerenciarContas.excluir(9L, 1L))
+                .isInstanceOf(RegraDeNegocioException.class)
+                .hasMessageContaining("tem lancamentos");
+
+        verify(contaRepository, never()).excluir(anyLong());
     }
 
     @Test

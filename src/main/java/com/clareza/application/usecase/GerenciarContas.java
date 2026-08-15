@@ -3,6 +3,7 @@ package com.clareza.application.usecase;
 import com.clareza.application.port.in.ComandoDeCriacaoDeConta;
 import com.clareza.application.port.in.GerenciarContasUseCase;
 import com.clareza.application.port.out.ContaRepositoryPort;
+import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.exception.RecursoNaoEncontradoException;
 import com.clareza.domain.exception.RegraDeNegocioException;
 import com.clareza.domain.model.Conta;
@@ -17,6 +18,7 @@ import java.util.List;
 public class GerenciarContas implements GerenciarContasUseCase {
 
     private final ContaRepositoryPort contaRepository;
+    private final TransacaoRepositoryPort transacaoRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -46,6 +48,11 @@ public class GerenciarContas implements GerenciarContasUseCase {
 
         if (!conta.pertenceA(usuarioId)) {
             throw new RecursoNaoEncontradoException("Conta", contaId);
+        }
+
+        if (transacaoRepository.existeComConta(contaId)) {
+            throw new RegraDeNegocioException(
+                    "Esta conta tem lancamentos e nao pode ser excluida");
         }
 
         contaRepository.excluir(contaId);

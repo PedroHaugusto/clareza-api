@@ -1,10 +1,14 @@
 package com.clareza.infrastructure.adapter.out.persistence;
 
+import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.application.port.out.TransacaoRepositoryPort;
+import com.clareza.domain.model.IntervaloDeDatas;
 import com.clareza.domain.model.Transacao;
 import com.clareza.infrastructure.adapter.out.persistence.mapper.TransacaoPersistenceMapper;
+import com.clareza.infrastructure.adapter.out.persistence.repository.EspecificacaoDeTransacao;
 import com.clareza.infrastructure.adapter.out.persistence.repository.TransacaoJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -20,6 +24,13 @@ public class TransacaoPersistenceAdapter implements TransacaoRepositoryPort {
     @Override
     public List<Transacao> listarDoUsuario(Long usuarioId) {
         return mapper.paraDominio(repository.findByUsuarioIdOrderByDataPrevistaDescIdDesc(usuarioId));
+    }
+
+    @Override
+    public List<Transacao> listarComFiltro(FiltroDeTransacoes filtro, IntervaloDeDatas intervalo) {
+        return mapper.paraDominio(repository.findAll(
+                EspecificacaoDeTransacao.de(filtro, intervalo),
+                Sort.by(Sort.Direction.DESC, "dataPrevista", "id")));
     }
 
     @Override

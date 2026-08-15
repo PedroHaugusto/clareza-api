@@ -2,6 +2,7 @@ package com.clareza.application.usecase;
 
 import com.clareza.application.port.in.ComandoDeCriacaoDeCategoria;
 import com.clareza.application.port.out.CategoriaRepositoryPort;
+import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.exception.RecursoNaoEncontradoException;
 import com.clareza.domain.exception.RegraDeNegocioException;
 import com.clareza.domain.model.Categoria;
@@ -30,6 +31,9 @@ class GerenciarCategoriasTest {
 
     @Mock
     private CategoriaRepositoryPort categoriaRepository;
+
+    @Mock
+    private TransacaoRepositoryPort transacaoRepository;
 
     @InjectMocks
     private GerenciarCategorias gerenciarCategorias;
@@ -100,15 +104,31 @@ class GerenciarCategoriasTest {
     }
 
     @Test
-    @DisplayName("categoria propria e excluida")
+    @DisplayName("categoria propria e sem lancamentos e excluida")
     void deveExcluirCategoriaDoProprioUsuario() {
         Categoria propria = Categoria.builder()
                 .id(9L).usuarioId(1L).nome("Pets").tipo(TipoCategoria.DESPESA).corHex("#AD1457").build();
         when(categoriaRepository.buscarPorId(9L)).thenReturn(Optional.of(propria));
+        when(transacaoRepository.existeComCategoria(9L)).thenReturn(false);
 
         gerenciarCategorias.excluir(9L, 1L);
 
         verify(categoriaRepository).excluir(9L);
+    }
+
+    @Test
+    @DisplayName("categoria com lancamentos responde 422 em vez de estourar a chave estrangeira")
+    void deveRecusarExclusaoDeCategoriaEmUso() {
+        Categoria propria = Categoria.builder()
+                .id(9L).usuarioId(1L).nome("Pets").tipo(TipoCategoria.DESPESA).corHex("#AD1457").build();
+        when(categoriaRepository.buscarPorId(9L)).thenReturn(Optional.of(propria));
+        when(transacaoRepository.existeComCategoria(9L)).thenReturn(true);
+
+        assertThatThrownBy(() -> gerenciarCategorias.excluir(9L, 1L))
+                .isInstanceOf(RegraDeNegocioException.class)
+                .hasMessageContaining("tem lancamentos");
+
+        verify(categoriaRepository, never()).excluir(anyLong());
     }
 
     @Test
