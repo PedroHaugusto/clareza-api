@@ -1,5 +1,6 @@
 package com.clareza.infrastructure.adapter.out.persistence.repository;
 
+import com.clareza.domain.model.StatusTransacao;
 import com.clareza.infrastructure.adapter.out.persistence.entity.TransacaoEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
@@ -22,6 +23,12 @@ public interface TransacaoJpaRepository
             + "AND t.status = com.clareza.domain.model.StatusTransacao.PREVISTA")
     int excluirFuturasNaoConfirmadas(@Param("recorrenteId") Long recorrenteId,
                                      @Param("apartirDe") LocalDate apartirDe);
+
+    List<TransacaoEntity> findByUsuarioIdAndDataPrevistaBetweenOrderByDataPrevistaAscIdAsc(
+            Long usuarioId, LocalDate inicio, LocalDate fim);
+
+    List<TransacaoEntity> findByUsuarioIdAndStatusAndDataPrevistaLessThanEqualOrderByDataPrevistaAscIdAsc(
+            Long usuarioId, StatusTransacao status, LocalDate limite);
 
     boolean existsByContaId(Long contaId);
 

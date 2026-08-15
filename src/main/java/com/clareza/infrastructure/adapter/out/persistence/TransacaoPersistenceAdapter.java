@@ -3,6 +3,7 @@ package com.clareza.infrastructure.adapter.out.persistence;
 import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.model.IntervaloDeDatas;
+import com.clareza.domain.model.StatusTransacao;
 import com.clareza.domain.model.Transacao;
 import com.clareza.infrastructure.adapter.out.persistence.entity.TransacaoEntity;
 import com.clareza.infrastructure.adapter.out.persistence.mapper.TransacaoPersistenceMapper;
@@ -34,6 +35,20 @@ public class TransacaoPersistenceAdapter implements TransacaoRepositoryPort {
         return mapper.paraDominio(repository.findAll(
                 EspecificacaoDeTransacao.de(filtro, intervalo),
                 Sort.by(Sort.Direction.DESC, "dataPrevista", "id")));
+    }
+
+    @Override
+    public List<Transacao> listarPorIntervalo(Long usuarioId, LocalDate inicio, LocalDate fim) {
+        return mapper.paraDominio(
+                repository.findByUsuarioIdAndDataPrevistaBetweenOrderByDataPrevistaAscIdAsc(
+                        usuarioId, inicio, fim));
+    }
+
+    @Override
+    public List<Transacao> listarPrevistasAte(Long usuarioId, LocalDate limite) {
+        return mapper.paraDominio(
+                repository.findByUsuarioIdAndStatusAndDataPrevistaLessThanEqualOrderByDataPrevistaAscIdAsc(
+                        usuarioId, StatusTransacao.PREVISTA, limite));
     }
 
     @Override

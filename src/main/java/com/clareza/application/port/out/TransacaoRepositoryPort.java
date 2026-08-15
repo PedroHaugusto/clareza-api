@@ -14,6 +14,10 @@ public interface TransacaoRepositoryPort {
 
     List<Transacao> listarComFiltro(FiltroDeTransacoes filtro, IntervaloDeDatas intervalo);
 
+    List<Transacao> listarPorIntervalo(Long usuarioId, LocalDate inicio, LocalDate fim);
+
+    List<Transacao> listarPrevistasAte(Long usuarioId, LocalDate limite);
+
     Optional<Transacao> buscarPorId(Long id);
 
     Transacao salvar(Transacao transacao);
