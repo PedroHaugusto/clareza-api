@@ -1,6 +1,7 @@
 package com.clareza.application.usecase;
 
 import com.clareza.application.port.in.ComandoDeRegistro;
+import com.clareza.application.port.in.CriarContasPadraoUseCase;
 import com.clareza.application.port.in.UsuarioAutenticado;
 import com.clareza.application.port.out.CodificadorDeSenhaPort;
 import com.clareza.application.port.out.GeradorDeTokenPort;
@@ -38,6 +39,9 @@ class RegistrarUsuarioTest {
     @Mock
     private GeradorDeTokenPort geradorDeToken;
 
+    @Mock
+    private CriarContasPadraoUseCase criarContasPadrao;
+
     @InjectMocks
     private RegistrarUsuario registrarUsuario;
 
@@ -60,6 +64,21 @@ class RegistrarUsuarioTest {
         assertThat(resultado.getEmail()).isEqualTo("ana@clareza.dev");
         assertThat(resultado.getToken()).isEqualTo("jwt-gerado");
         assertThat(resultado.getExpiraEm()).isEqualTo(VENCIMENTO);
+    }
+
+    @Test
+    @DisplayName("quem se registra ja ganha as contas padrao, com o id recem gerado")
+    void deveSemearAsContasPadrao() {
+        when(usuarioRepository.existePorEmail("ana@clareza.dev")).thenReturn(false);
+        when(codificadorDeSenha.codificar("senha-secreta")).thenReturn("hash-bcrypt");
+        when(usuarioRepository.salvar(any(Usuario.class)))
+                .thenAnswer(chamada -> ((Usuario) chamada.getArgument(0)).toBuilder().id(42L).build());
+        when(geradorDeToken.gerarPara(any(Usuario.class)))
+                .thenReturn(new GeradorDeTokenPort.TokenGerado("jwt-gerado", VENCIMENTO));
+
+        registrarUsuario.registrar(new ComandoDeRegistro("Ana", "ana@clareza.dev", "senha-secreta"));
+
+        verify(criarContasPadrao).criarPara(42L);
     }
 
     @Test

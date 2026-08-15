@@ -1,6 +1,7 @@
 package com.clareza.application.usecase;
 
 import com.clareza.application.port.in.ComandoDeRegistro;
+import com.clareza.application.port.in.CriarContasPadraoUseCase;
 import com.clareza.application.port.in.RegistrarUsuarioUseCase;
 import com.clareza.application.port.in.UsuarioAutenticado;
 import com.clareza.application.port.out.CodificadorDeSenhaPort;
@@ -19,6 +20,7 @@ public class RegistrarUsuario implements RegistrarUsuarioUseCase {
     private final UsuarioRepositoryPort usuarioRepository;
     private final CodificadorDeSenhaPort codificadorDeSenha;
     private final GeradorDeTokenPort geradorDeToken;
+    private final CriarContasPadraoUseCase criarContasPadrao;
 
     @Override
     @Transactional
@@ -34,6 +36,8 @@ public class RegistrarUsuario implements RegistrarUsuarioUseCase {
                 .build();
 
         Usuario salvo = usuarioRepository.salvar(novoUsuario);
+        criarContasPadrao.criarPara(salvo.getId());
+
         GeradorDeTokenPort.TokenGerado token = geradorDeToken.gerarPara(salvo);
 
         return UsuarioAutenticado.builder()

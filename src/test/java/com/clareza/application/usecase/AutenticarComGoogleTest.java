@@ -1,6 +1,7 @@
 package com.clareza.application.usecase;
 
 import com.clareza.application.port.in.ComandoDeLoginComGoogle;
+import com.clareza.application.port.in.CriarContasPadraoUseCase;
 import com.clareza.application.port.in.UsuarioAutenticado;
 import com.clareza.application.port.out.GeradorDeTokenPort;
 import com.clareza.application.port.out.UsuarioRepositoryPort;
@@ -21,6 +22,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -41,6 +43,9 @@ class AutenticarComGoogleTest {
 
     @Mock
     private GeradorDeTokenPort geradorDeToken;
+
+    @Mock
+    private CriarContasPadraoUseCase criarContasPadrao;
 
     @InjectMocks
     private AutenticarComGoogle autenticarComGoogle;
@@ -84,6 +89,7 @@ class AutenticarComGoogleTest {
         assertThat(capturado.getValue().getGoogleId()).isEqualTo(GOOGLE_ID);
         assertThat(capturado.getValue().getNome()).isEqualTo("Ana Souza");
         assertThat(resultado.getId()).isEqualTo(7L);
+        verify(criarContasPadrao).criarPara(7L);
     }
 
     @Test
@@ -106,6 +112,7 @@ class AutenticarComGoogleTest {
         assertThat(capturado.getValue().getId()).isEqualTo(42L);
         assertThat(capturado.getValue().getGoogleId()).isEqualTo(GOOGLE_ID);
         assertThat(capturado.getValue().getSenhaHash()).isEqualTo("hash-bcrypt");
+        verify(criarContasPadrao, never()).criarPara(anyLong());
     }
 
     @Test
