@@ -1,15 +1,9 @@
 package com.clareza.application.usecase;
 
 import com.clareza.application.port.in.ComandoDeTransacao;
-import com.clareza.application.port.out.CategoriaRepositoryPort;
-import com.clareza.application.port.out.ContaRepositoryPort;
 import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.exception.RecursoNaoEncontradoException;
-import com.clareza.domain.model.Categoria;
-import com.clareza.domain.model.Conta;
 import com.clareza.domain.model.StatusTransacao;
-import com.clareza.domain.model.TipoCategoria;
-import com.clareza.domain.model.TipoConta;
 import com.clareza.domain.model.TipoTransacao;
 import com.clareza.domain.model.Transacao;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -42,10 +37,7 @@ class GerenciarTransacoesTest {
     private TransacaoRepositoryPort transacaoRepository;
 
     @Mock
-    private ContaRepositoryPort contaRepository;
-
-    @Mock
-    private CategoriaRepositoryPort categoriaRepository;
+    private VinculosDaTransacao vinculos;
 
     @InjectMocks
     private GerenciarTransacoes gerenciarTransacoes;
@@ -53,7 +45,6 @@ class GerenciarTransacoesTest {
     @Test
     @DisplayName("transacao sem data de efetivacao nasce prevista")
     void deveCriarComoPrevista() {
-        prepararContaECategoriaValidas();
         when(transacaoRepository.salvar(any(Transacao.class))).thenAnswer(c -> c.getArgument(0));
 
         gerenciarTransacoes.criar(comando().build());
@@ -68,7 +59,6 @@ class GerenciarTransacoesTest {
     @Test
     @DisplayName("informar data de efetivacao ja lanca como confirmada")
     void deveCriarComoConfirmada_quandoInformaDataDeEfetivacao() {
-        prepararContaECategoriaValidas();
         when(transacaoRepository.salvar(any(Transacao.class))).thenAnswer(c -> c.getArgument(0));
 
         gerenciarTransacoes.criar(comando().dataEfetivacao(DATA).build());
@@ -80,44 +70,26 @@ class GerenciarTransacoesTest {
     }
 
     @Test
-    @DisplayName("conta de outro usuario e tratada como inexistente")
-    void deveRecusarContaDeOutroUsuario() {
-        Conta deOutro = Conta.builder()
-                .id(10L).usuarioId(2L).nome("Nubank").tipo(TipoConta.CARTAO_CREDITO).build();
-        when(contaRepository.buscarPorId(10L)).thenReturn(Optional.of(deOutro));
+    @DisplayName("vinculo invalido aborta antes de gravar")
+    void naoDeveGravar_quandoOVinculoEInvalido() {
+        doThrow(new RecursoNaoEncontradoException("Conta", 10L))
+                .when(vinculos).exigirContaDoUsuario(10L, 1L);
 
         assertThatThrownBy(() -> gerenciarTransacoes.criar(comando().build()))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("Conta");
+                .isInstanceOf(RecursoNaoEncontradoException.class);
 
         verify(transacaoRepository, never()).salvar(any(Transacao.class));
     }
 
     @Test
-    @DisplayName("categoria de outro usuario e tratada como inexistente")
-    void deveRecusarCategoriaDeOutroUsuario() {
-        when(contaRepository.buscarPorId(10L)).thenReturn(Optional.of(contaDoUsuario()));
-        Categoria deOutro = Categoria.builder()
-                .id(20L).usuarioId(2L).nome("Pets").tipo(TipoCategoria.DESPESA).corHex("#AD1457").build();
-        when(categoriaRepository.buscarPorId(20L)).thenReturn(Optional.of(deOutro));
-
-        assertThatThrownBy(() -> gerenciarTransacoes.criar(comando().build()))
-                .isInstanceOf(RecursoNaoEncontradoException.class)
-                .hasMessageContaining("Categoria");
-    }
-
-    @Test
-    @DisplayName("categoria padrao do sistema pode ser usada por qualquer usuario")
-    void deveAceitarCategoriaPadraoDoSistema() {
-        when(contaRepository.buscarPorId(10L)).thenReturn(Optional.of(contaDoUsuario()));
-        Categoria global = Categoria.builder()
-                .id(20L).nome("Moradia").tipo(TipoCategoria.DESPESA).corHex("#6D4C41").build();
-        when(categoriaRepository.buscarPorId(20L)).thenReturn(Optional.of(global));
+    @DisplayName("conta e categoria sao validadas em toda criacao")
+    void deveValidarOsVinculosAoCriar() {
         when(transacaoRepository.salvar(any(Transacao.class))).thenAnswer(c -> c.getArgument(0));
 
         gerenciarTransacoes.criar(comando().build());
 
-        verify(transacaoRepository).salvar(any(Transacao.class));
+        verify(vinculos).exigirContaDoUsuario(10L, 1L);
+        verify(vinculos).exigirCategoriaVisivel(20L, 1L);
     }
 
     @Test
@@ -131,7 +103,6 @@ class GerenciarTransacoesTest {
                 .grupoParcelamentoId(grupo).numeroParcela(1).totalParcelas(3)
                 .build();
         when(transacaoRepository.buscarPorId(7L)).thenReturn(Optional.of(existente));
-        prepararContaECategoriaValidas();
         when(transacaoRepository.salvar(any(Transacao.class))).thenAnswer(c -> c.getArgument(0));
 
         gerenciarTransacoes.editar(7L, comando().descricao("Geladeira nova").build());
@@ -173,21 +144,6 @@ class GerenciarTransacoesTest {
         gerenciarTransacoes.excluir(7L, 1L);
 
         verify(transacaoRepository).excluir(7L);
-    }
-
-    private void prepararContaECategoriaValidas() {
-        when(contaRepository.buscarPorId(10L)).thenReturn(Optional.of(contaDoUsuario()));
-        when(categoriaRepository.buscarPorId(20L)).thenReturn(Optional.of(categoriaDoUsuario()));
-    }
-
-    private Conta contaDoUsuario() {
-        return Conta.builder()
-                .id(10L).usuarioId(1L).nome("Conta principal").tipo(TipoConta.CONTA_CORRENTE).build();
-    }
-
-    private Categoria categoriaDoUsuario() {
-        return Categoria.builder()
-                .id(20L).usuarioId(1L).nome("Pets").tipo(TipoCategoria.DESPESA).corHex("#AD1457").build();
     }
 
     private ComandoDeTransacao.ComandoDeTransacaoBuilder comando() {

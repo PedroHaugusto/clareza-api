@@ -17,6 +17,8 @@ public interface TransacaoRepositoryPort {
 
     Transacao salvar(Transacao transacao);
 
+    List<Transacao> salvarTodas(List<Transacao> transacoes);
+
     void excluir(Long id);
 
     boolean existeComConta(Long contaId);

@@ -3,12 +3,8 @@ package com.clareza.application.usecase;
 import com.clareza.application.port.in.ComandoDeTransacao;
 import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.application.port.in.GerenciarTransacoesUseCase;
-import com.clareza.application.port.out.CategoriaRepositoryPort;
-import com.clareza.application.port.out.ContaRepositoryPort;
 import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.exception.RecursoNaoEncontradoException;
-import com.clareza.domain.model.Categoria;
-import com.clareza.domain.model.Conta;
 import com.clareza.domain.model.StatusTransacao;
 import com.clareza.domain.model.Transacao;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +19,7 @@ import java.util.List;
 public class GerenciarTransacoes implements GerenciarTransacoesUseCase {
 
     private final TransacaoRepositoryPort transacaoRepository;
-    private final ContaRepositoryPort contaRepository;
-    private final CategoriaRepositoryPort categoriaRepository;
+    private final VinculosDaTransacao vinculos;
 
     @Override
     @Transactional(readOnly = true)
@@ -101,20 +96,10 @@ public class GerenciarTransacoes implements GerenciarTransacoesUseCase {
     }
 
     private void exigirContaDoUsuario(Long contaId, Long usuarioId) {
-        Conta conta = contaRepository.buscarPorId(contaId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Conta", contaId));
-
-        if (!conta.pertenceA(usuarioId)) {
-            throw new RecursoNaoEncontradoException("Conta", contaId);
-        }
+        vinculos.exigirContaDoUsuario(contaId, usuarioId);
     }
 
     private void exigirCategoriaVisivel(Long categoriaId, Long usuarioId) {
-        Categoria categoria = categoriaRepository.buscarPorId(categoriaId)
-                .orElseThrow(() -> new RecursoNaoEncontradoException("Categoria", categoriaId));
-
-        if (!categoria.ehPadraoDoSistema() && !categoria.pertenceA(usuarioId)) {
-            throw new RecursoNaoEncontradoException("Categoria", categoriaId);
-        }
+        vinculos.exigirCategoriaVisivel(categoriaId, usuarioId);
     }
 }

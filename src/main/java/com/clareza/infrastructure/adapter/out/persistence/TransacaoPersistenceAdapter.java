@@ -4,6 +4,7 @@ import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.application.port.out.TransacaoRepositoryPort;
 import com.clareza.domain.model.IntervaloDeDatas;
 import com.clareza.domain.model.Transacao;
+import com.clareza.infrastructure.adapter.out.persistence.entity.TransacaoEntity;
 import com.clareza.infrastructure.adapter.out.persistence.mapper.TransacaoPersistenceMapper;
 import com.clareza.infrastructure.adapter.out.persistence.repository.EspecificacaoDeTransacao;
 import com.clareza.infrastructure.adapter.out.persistence.repository.TransacaoJpaRepository;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -41,6 +43,14 @@ public class TransacaoPersistenceAdapter implements TransacaoRepositoryPort {
     @Override
     public Transacao salvar(Transacao transacao) {
         return mapper.paraDominio(repository.save(mapper.paraEntidade(transacao)));
+    }
+
+    @Override
+    public List<Transacao> salvarTodas(List<Transacao> transacoes) {
+        List<TransacaoEntity> entidades = transacoes.stream()
+                .map(mapper::paraEntidade)
+                .collect(Collectors.toList());
+        return mapper.paraDominio(repository.saveAll(entidades));
     }
 
     @Override

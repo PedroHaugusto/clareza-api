@@ -1,10 +1,13 @@
 package com.clareza.infrastructure.adapter.in.web;
 
+import com.clareza.application.port.in.ComandoDeParcelamento;
 import com.clareza.application.port.in.ComandoDeTransacao;
+import com.clareza.application.port.in.CriarTransacaoParceladaUseCase;
 import com.clareza.application.port.in.FiltroDeTransacoes;
 import com.clareza.application.port.in.GerenciarTransacoesUseCase;
 import com.clareza.domain.model.PeriodoDeBusca;
 import com.clareza.domain.model.TipoTransacao;
+import com.clareza.infrastructure.adapter.in.web.dto.RequisicaoDeParcelamento;
 import com.clareza.infrastructure.adapter.in.web.dto.RequisicaoDeTransacao;
 import com.clareza.infrastructure.adapter.in.web.dto.RespostaTransacao;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +36,7 @@ import java.util.stream.Collectors;
 public class TransacaoController {
 
     private final GerenciarTransacoesUseCase gerenciarTransacoes;
+    private final CriarTransacaoParceladaUseCase criarTransacaoParcelada;
 
     @GetMapping
     public List<RespostaTransacao> listar(@AuthenticationPrincipal Long usuarioId,
@@ -67,6 +71,27 @@ public class TransacaoController {
                                    @Valid @RequestBody RequisicaoDeTransacao requisicao) {
         return RespostaTransacao.de(
                 gerenciarTransacoes.criar(comando(usuarioId, requisicao)), LocalDate.now());
+    }
+
+    @PostMapping("/parcelada")
+    @ResponseStatus(HttpStatus.CREATED)
+    public List<RespostaTransacao> parcelar(@AuthenticationPrincipal Long usuarioId,
+                                            @Valid @RequestBody RequisicaoDeParcelamento requisicao) {
+        ComandoDeParcelamento comando = ComandoDeParcelamento.builder()
+                .usuarioId(usuarioId)
+                .contaId(requisicao.getContaId())
+                .categoriaId(requisicao.getCategoriaId())
+                .descricao(requisicao.getDescricao())
+                .valorTotal(requisicao.getValorTotal())
+                .tipo(requisicao.getTipo())
+                .dataDaPrimeiraParcela(requisicao.getDataDaPrimeiraParcela())
+                .totalParcelas(requisicao.getTotalParcelas())
+                .build();
+
+        LocalDate hoje = LocalDate.now();
+        return criarTransacaoParcelada.parcelar(comando).stream()
+                .map(transacao -> RespostaTransacao.de(transacao, hoje))
+                .collect(Collectors.toList());
     }
 
     @PutMapping("/{id}")
