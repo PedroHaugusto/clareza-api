@@ -114,4 +114,4 @@ autenticação (registro, login por senha e login com Google, todos emitindo JWT
 cadastro de categorias e contas/cartões, lançamentos com filtros combináveis e confirmação, e
 os lançamentos parcelados e recorrentes, o calendário mensal com alertas de vencimento e a
 visão geral com saldo e projeção dos próximos meses, além da previsão com cenários e do fluxo
-de caixa. Próximo: Bloco 10 (investimentos e meta de aporte).
+de caixa, e os investimentos com meta de aporte mensal. Próximo: Bloco 11 (metas financeiras).
