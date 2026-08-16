@@ -34,6 +34,8 @@ services:
       JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-60}
       # Vazio desliga o login social: /api/auth/google responde 401 explicando o motivo.
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      # Define o que a API considera "hoje" nas regras de vencimento, calendario e saldo.
+      APP_TIMEZONE: ${APP_TIMEZONE:-America/Sao_Paulo}
     ports:
       - "8080:8080"
     restart: unless-stopped

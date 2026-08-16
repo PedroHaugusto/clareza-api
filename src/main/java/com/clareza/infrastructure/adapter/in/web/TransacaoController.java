@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ public class TransacaoController {
 
     private final GerenciarTransacoesUseCase gerenciarTransacoes;
     private final CriarTransacaoParceladaUseCase criarTransacaoParcelada;
+    private final Clock relogio;
 
     @GetMapping
     public List<RespostaTransacao> listar(@AuthenticationPrincipal Long usuarioId,
@@ -54,7 +56,7 @@ public class TransacaoController {
                 .busca(busca)
                 .build();
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(relogio);
         return gerenciarTransacoes.listar(filtro).stream()
                 .map(transacao -> RespostaTransacao.de(transacao, hoje))
                 .collect(Collectors.toList());
@@ -62,7 +64,7 @@ public class TransacaoController {
 
     @PatchMapping("/{id}/confirmar")
     public RespostaTransacao confirmar(@AuthenticationPrincipal Long usuarioId, @PathVariable Long id) {
-        return RespostaTransacao.de(gerenciarTransacoes.confirmar(id, usuarioId), LocalDate.now());
+        return RespostaTransacao.de(gerenciarTransacoes.confirmar(id, usuarioId), LocalDate.now(relogio));
     }
 
     @PostMapping
@@ -70,7 +72,7 @@ public class TransacaoController {
     public RespostaTransacao criar(@AuthenticationPrincipal Long usuarioId,
                                    @Valid @RequestBody RequisicaoDeTransacao requisicao) {
         return RespostaTransacao.de(
-                gerenciarTransacoes.criar(comando(usuarioId, requisicao)), LocalDate.now());
+                gerenciarTransacoes.criar(comando(usuarioId, requisicao)), LocalDate.now(relogio));
     }
 
     @PostMapping("/parcelada")
@@ -88,7 +90,7 @@ public class TransacaoController {
                 .totalParcelas(requisicao.getTotalParcelas())
                 .build();
 
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(relogio);
         return criarTransacaoParcelada.parcelar(comando).stream()
                 .map(transacao -> RespostaTransacao.de(transacao, hoje))
                 .collect(Collectors.toList());
@@ -99,7 +101,7 @@ public class TransacaoController {
                                     @PathVariable Long id,
                                     @Valid @RequestBody RequisicaoDeTransacao requisicao) {
         return RespostaTransacao.de(
-                gerenciarTransacoes.editar(id, comando(usuarioId, requisicao)), LocalDate.now());
+                gerenciarTransacoes.editar(id, comando(usuarioId, requisicao)), LocalDate.now(relogio));
     }
 
     @DeleteMapping("/{id}")

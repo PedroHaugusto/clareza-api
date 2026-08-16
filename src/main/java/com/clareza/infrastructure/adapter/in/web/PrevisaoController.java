@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.LocalDate;
 
 @RestController
@@ -25,6 +26,7 @@ public class PrevisaoController {
 
     private final ConsultarPrevisaoUseCase consultarPrevisao;
     private final GerenciarPreferenciaCenarioUseCase gerenciarPreferencia;
+    private final Clock relogio;
 
     @GetMapping("/api/previsao")
     public RespostaPrevisao consultar(@AuthenticationPrincipal Long usuarioId,
@@ -40,7 +42,7 @@ public class PrevisaoController {
                 .ajusteDespesa(ajusteDespesa)
                 .build();
 
-        return RespostaPrevisao.de(consultarPrevisao.consultar(comando), LocalDate.now());
+        return RespostaPrevisao.de(consultarPrevisao.consultar(comando), LocalDate.now(relogio));
     }
 
     @GetMapping("/api/preferencia-cenario")

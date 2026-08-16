@@ -34,6 +34,10 @@ spring:
       write-dates-as-timestamps: false
 
 clareza:
+  # "Hoje" e sempre o dia do usuario, nao o do servidor: em UTC, das 21h a meia-noite o
+  # servidor ja estaria no dia seguinte, marcando como atrasado o que vence hoje.
+  fuso-horario: ${APP_TIMEZONE:America/Sao_Paulo}
+
   jwt:
     # Precisa de no minimo 32 bytes para o HS256. Em producao vem do ambiente.
     segredo: ${JWT_SECRET:segredo-apenas-de-desenvolvimento-local-troque-em-producao}

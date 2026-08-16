@@ -23,9 +23,13 @@ RUN chown clareza:clareza app.jar
 USER clareza
 EXPOSE 8080
 
+# Alinha o relogio do sistema ao fuso da aplicacao, para os logs baterem com o que o usuario ve.
+# Quem decide as datas de negocio e o bean Clock de ConfiguracaoDataHora, nao esta variavel.
+ENV TZ=America/Sao_Paulo
+
 # MaxRAMPercentage: sem isso a JVM calcula o heap errado nos 512 MB do free tier do Render.
 # UseSerialGC: o G1 gasta heap em estruturas do coletor sem ganho real nessa escala.
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+UseSerialGC"
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=75.0 -XX:+UseSerialGC -Duser.timezone=America/Sao_Paulo"
 
 # O exec faz a JVM virar PID 1 e receber o SIGTERM, permitindo shutdown limpo.
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar app.jar"]

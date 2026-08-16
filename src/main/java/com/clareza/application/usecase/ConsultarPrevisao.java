@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -23,11 +24,12 @@ public class ConsultarPrevisao implements ConsultarPrevisaoUseCase {
     private final TransacaoRepositoryPort transacaoRepository;
     private final GerenciarPreferenciaCenarioUseCase gerenciarPreferencia;
     private final ConsultarVisaoGeralUseCase consultarVisaoGeral;
+    private final Clock relogio;
 
     @Override
     @Transactional(readOnly = true)
     public Previsao consultar(ComandoDePrevisao comando) {
-        YearMonth primeiraCompetencia = YearMonth.from(LocalDate.now()).plusMonths(1);
+        YearMonth primeiraCompetencia = YearMonth.from(LocalDate.now(relogio)).plusMonths(1);
         YearMonth ultimaCompetencia = primeiraCompetencia.plusMonths(comando.getMeses() - 1L);
 
         List<Transacao> transacoes = transacaoRepository.listarPorIntervalo(

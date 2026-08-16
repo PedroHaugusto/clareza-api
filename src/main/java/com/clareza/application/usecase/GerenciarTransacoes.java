@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -20,19 +21,20 @@ public class GerenciarTransacoes implements GerenciarTransacoesUseCase {
 
     private final TransacaoRepositoryPort transacaoRepository;
     private final VinculosDaTransacao vinculos;
+    private final Clock relogio;
 
     @Override
     @Transactional(readOnly = true)
     public List<Transacao> listar(FiltroDeTransacoes filtro) {
         return transacaoRepository.listarComFiltro(
-                filtro, filtro.getPeriodo().intervaloA(LocalDate.now()));
+                filtro, filtro.getPeriodo().intervaloA(LocalDate.now(relogio)));
     }
 
     @Override
     @Transactional
     public Transacao confirmar(Long transacaoId, Long usuarioId) {
         Transacao transacao = buscarDoUsuario(transacaoId, usuarioId);
-        return transacaoRepository.salvar(transacao.confirmarEm(LocalDate.now()));
+        return transacaoRepository.salvar(transacao.confirmarEm(LocalDate.now(relogio)));
     }
 
     @Override

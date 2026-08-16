@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -20,6 +21,7 @@ public class ConsultarFluxoDeCaixa implements ConsultarFluxoDeCaixaUseCase {
     static final int MAXIMO_DE_MESES = 24;
 
     private final TransacaoRepositoryPort transacaoRepository;
+    private final Clock relogio;
 
     @Override
     @Transactional(readOnly = true)
@@ -27,7 +29,7 @@ public class ConsultarFluxoDeCaixa implements ConsultarFluxoDeCaixaUseCase {
         exigirFaixaValida(mesesPassados, "mesesPassados");
         exigirFaixaValida(mesesFuturos, "mesesFuturos");
 
-        YearMonth competenciaAtual = YearMonth.from(LocalDate.now());
+        YearMonth competenciaAtual = YearMonth.from(LocalDate.now(relogio));
         YearMonth primeira = competenciaAtual.minusMonths(mesesPassados);
         YearMonth ultima = competenciaAtual.plusMonths(mesesFuturos);
 

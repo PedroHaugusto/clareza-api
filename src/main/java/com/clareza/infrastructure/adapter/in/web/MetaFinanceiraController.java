@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,10 +29,11 @@ import java.util.stream.Collectors;
 public class MetaFinanceiraController {
 
     private final GerenciarMetasFinanceirasUseCase gerenciarMetas;
+    private final Clock relogio;
 
     @GetMapping
     public List<RespostaMetaFinanceira> listar(@AuthenticationPrincipal Long usuarioId) {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(relogio);
         return gerenciarMetas.listar(usuarioId).stream()
                 .map(meta -> RespostaMetaFinanceira.de(meta, hoje))
                 .collect(Collectors.toList());
@@ -42,7 +44,7 @@ public class MetaFinanceiraController {
     public RespostaMetaFinanceira criar(@AuthenticationPrincipal Long usuarioId,
                                         @Valid @RequestBody RequisicaoDeMetaFinanceira requisicao) {
         return RespostaMetaFinanceira.de(
-                gerenciarMetas.criar(comando(usuarioId, requisicao)), LocalDate.now());
+                gerenciarMetas.criar(comando(usuarioId, requisicao)), LocalDate.now(relogio));
     }
 
     @PutMapping("/{id}")
@@ -50,7 +52,7 @@ public class MetaFinanceiraController {
                                          @PathVariable Long id,
                                          @Valid @RequestBody RequisicaoDeMetaFinanceira requisicao) {
         return RespostaMetaFinanceira.de(
-                gerenciarMetas.editar(id, comando(usuarioId, requisicao)), LocalDate.now());
+                gerenciarMetas.editar(id, comando(usuarioId, requisicao)), LocalDate.now(relogio));
     }
 
     @DeleteMapping("/{id}")

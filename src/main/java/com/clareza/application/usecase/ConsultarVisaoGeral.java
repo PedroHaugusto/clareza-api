@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
@@ -19,11 +20,12 @@ public class ConsultarVisaoGeral implements ConsultarVisaoGeralUseCase {
     static final int MESES_FUTUROS = 3;
 
     private final TransacaoRepositoryPort transacaoRepository;
+    private final Clock relogio;
 
     @Override
     @Transactional(readOnly = true)
     public VisaoGeral consultar(Long usuarioId) {
-        YearMonth competenciaAtual = YearMonth.from(LocalDate.now());
+        YearMonth competenciaAtual = YearMonth.from(LocalDate.now(relogio));
         LocalDate limite = competenciaAtual.plusMonths(MESES_FUTUROS).atEndOfMonth();
 
         List<TotalMensal> totais = transacaoRepository.totalizarPorMesAte(usuarioId, limite);

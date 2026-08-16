@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Clock;
 import java.time.LocalDate;
 
 @RestController
@@ -17,12 +18,13 @@ import java.time.LocalDate;
 public class CalendarioController {
 
     private final ConsultarCalendarioUseCase consultarCalendario;
+    private final Clock relogio;
 
     @GetMapping
     public RespostaCalendario consultar(@AuthenticationPrincipal Long usuarioId,
                                         @RequestParam(required = false) Integer mes,
                                         @RequestParam(required = false) Integer ano) {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(relogio);
         int mesConsultado = mes == null ? hoje.getMonthValue() : mes;
         int anoConsultado = ano == null ? hoje.getYear() : ano;
 

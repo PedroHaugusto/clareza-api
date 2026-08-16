@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,6 +26,7 @@ public class GerenciarRecorrencias implements GerenciarRecorrenciasUseCase {
     private final TransacaoRecorrenteRepositoryPort recorrenteRepository;
     private final TransacaoRepositoryPort transacaoRepository;
     private final VinculosDaTransacao vinculos;
+    private final Clock relogio;
 
     @Override
     @Transactional(readOnly = true)
@@ -70,11 +72,11 @@ public class GerenciarRecorrencias implements GerenciarRecorrenciasUseCase {
         }
 
         recorrenteRepository.salvar(recorrente.desativar());
-        transacaoRepository.excluirFuturasNaoConfirmadasDaRecorrencia(recorrenteId, LocalDate.now());
+        transacaoRepository.excluirFuturasNaoConfirmadasDaRecorrencia(recorrenteId, LocalDate.now(relogio));
     }
 
     private void materializarOcorrencias(TransacaoRecorrente recorrente) {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(relogio);
         List<LocalDate> datas = recorrente.ocorrenciasEntre(hoje, hoje.plusMonths(HORIZONTE_EM_MESES));
 
         if (datas.isEmpty()) {

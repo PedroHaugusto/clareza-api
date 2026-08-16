@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,10 +19,11 @@ import java.util.stream.Collectors;
 public class VencimentoController {
 
     private final ConsultarVencimentosUseCase consultarVencimentos;
+    private final Clock relogio;
 
     @GetMapping
     public List<RespostaTransacao> consultar(@AuthenticationPrincipal Long usuarioId) {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = LocalDate.now(relogio);
         return consultarVencimentos.consultar(usuarioId).stream()
                 .map(transacao -> RespostaTransacao.de(transacao, hoje))
                 .collect(Collectors.toList());

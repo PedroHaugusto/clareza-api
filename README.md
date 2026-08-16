@@ -57,6 +57,14 @@ curl http://localhost:8080/actuator/health   # {"status":"UP"}
 O CORS libera `http://localhost:4200` por padrão, e só nas rotas `/api/**`. Para liberar outras
 origens, use `CORS_ALLOWED_ORIGINS` com a lista separada por vírgula.
 
+### Fuso horário
+
+`APP_TIMEZONE` (padrão `America/Sao_Paulo`) define o que a API considera **hoje** — o que decide
+se uma conta está atrasada, qual é o mês do calendário, a janela de vencimentos e o saldo
+disponível. As datas de negócio saem de um `Clock` configurado, não do relógio do servidor:
+rodando em UTC, das 21h à meia-noite o servidor já estaria no dia seguinte e marcaria como
+atrasado o que ainda vence hoje.
+
 ## Autenticação
 
 `/actuator/health` e as rotas `/api/auth/**` são públicas. Todo o resto exige um JWT emitido
