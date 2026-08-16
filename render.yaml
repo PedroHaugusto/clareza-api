@@ -3,7 +3,9 @@ services:
     name: clareza-api
     runtime: docker
     dockerfilePath: ./Dockerfile
-    region: oregon
+    # Mesma costa do banco no Neon (us-east-2). Regiao cruzada poria o continente
+    # inteiro entre a API e o Postgres em toda query.
+    region: ohio
     plan: free
     branch: main
     # Desligado de proposito: quem dispara o deploy e o workflow de CI, depois dos testes.
