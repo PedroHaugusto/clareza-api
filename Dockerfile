@@ -12,9 +12,12 @@ COPY src/ src/
 RUN ./mvnw -B clean package -DskipTests
 
 # ---------- runtime ----------
-FROM eclipse-temurin:8-jre-alpine
+# Nao usar a variante alpine: a build musl do Java 8 nao traz as cifras que o TLS do Neon
+# exige, e a conexao morre com handshake_failure. Custa uns 90 MB a mais de imagem, e o
+# limite apertado do free tier do Render e de memoria, nao de disco.
+FROM eclipse-temurin:8-jre
 
-RUN addgroup -S clareza && adduser -S clareza -G clareza
+RUN groupadd --system clareza && useradd --system --gid clareza --shell /bin/false clareza
 
 WORKDIR /app
 COPY --from=build /app/target/clareza-api-*.jar app.jar
