@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: clareza-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    region: oregon
+    plan: free
+    branch: main
+    # Desligado de proposito: quem dispara o deploy e o workflow de CI, depois dos testes.
+    autoDeploy: false
+    healthCheckPath: /actuator/health
+
+    envVars:
+      # O Render injeta PORT sozinho; o application.yml ja o consome.
+
+      # sync: false = valor definido no painel, nunca no repositorio.
+      # DATABASE_URL precisa estar em formato JDBC. O Neon entrega
+      # postgresql://usuario:senha@host/banco?sslmode=require, entao converta para
+      # jdbc:postgresql://host/banco?sslmode=require e separe usuario e senha.
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USER
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+
+      # Minimo de 32 caracteres. Gere com: openssl rand -base64 48
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRATION_MINUTES
+        value: "60"
+
+      # Vazio mantem o login social desligado, com 401 explicando o motivo.
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+
+      # Origem do frontend. Ajuste quando o clareza-web for publicado.
+      - key: CORS_ALLOWED_ORIGINS
+        sync: false
+
+      # Define o que a API considera "hoje" nas regras de vencimento, calendario e saldo.
+      - key: APP_TIMEZONE
+        value: America/Sao_Paulo

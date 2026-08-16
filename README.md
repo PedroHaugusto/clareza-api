@@ -115,6 +115,47 @@ Os testes de integração sobem um PostgreSQL 16 real via Testcontainers — o D
 rodando. O `pom.xml` fixa `api.version=1.43` no surefire: o Testcontainers 1.19.x negocia a API
 1.32 por padrão, versão que o Docker Engine 29 já removeu.
 
+## Deploy
+
+A cada push na `main`, o GitHub Actions roda build e testes; **só se tudo passar** ele chama o
+deploy hook do Render. Pull request roda os testes, mas não publica.
+
+### 1. Banco no Neon
+
+Crie o projeto **como PostgreSQL 16** — o Flyway 9.x recusa a conexão com versões mais novas.
+O Neon entrega a string no formato `postgresql://usuario:senha@host/banco?sslmode=require`, que
+**não** é aceita direto: a aplicação espera JDBC, com usuário e senha separados.
+
+| Variável | Valor a partir da string do Neon |
+|---|---|
+| `DATABASE_URL` | `jdbc:postgresql://host/banco?sslmode=require` |
+| `DATABASE_USER` | o usuário |
+| `DATABASE_PASSWORD` | a senha |
+
+O Flyway cria todo o schema no primeiro boot; não é preciso rodar nada à mão.
+
+### 2. API no Render
+
+O `render.yaml` na raiz já descreve o serviço (Docker, plano free, health check em
+`/actuator/health`, `autoDeploy` desligado). No painel: **New → Blueprint**, aponte para o
+repositório e preencha as variáveis marcadas como `sync: false` — as três do banco,
+`GOOGLE_CLIENT_ID` e `CORS_ALLOWED_ORIGINS` com a origem do frontend. O `JWT_SECRET` o próprio
+Render gera.
+
+### 3. Ligar o CI ao Render
+
+Em **Settings → Deploy Hook** do serviço, copie a URL e cadastre no GitHub em
+**Settings → Secrets and variables → Actions** com o nome `RENDER_DEPLOY_HOOK`.
+
+Sem esse secret, o workflow ainda roda os testes e passa — apenas registra no log que nenhum
+deploy foi disparado, em vez de falhar.
+
+### Sobre o free tier
+
+O serviço hiberna após inatividade, então a primeira requisição depois de um tempo parado leva
+alguns segundos. O `-XX:MaxRAMPercentage=75` no Dockerfile existe porque, sem ele, a JVM calcula
+o heap errado nos 512 MB do plano gratuito.
+
 ## Status
 
 Blocos 1 a 6 concluídos: ambiente em Docker, tratamento de erro centralizado, CORS,
@@ -122,5 +163,5 @@ autenticação (registro, login por senha e login com Google, todos emitindo JWT
 cadastro de categorias e contas/cartões, lançamentos com filtros combináveis e confirmação, e
 os lançamentos parcelados e recorrentes, o calendário mensal com alertas de vencimento e a
 visão geral com saldo e projeção dos próximos meses, além da previsão com cenários e do fluxo
-de caixa, os investimentos com meta de aporte mensal e as metas financeiras. Todas as
-funcionalidades estão prontas. Próximo: Bloco 12 (deploy).
+de caixa, os investimentos com meta de aporte mensal e as metas financeiras, além do pipeline
+de CI e da configuração de deploy. Todos os 12 blocos do roadmap estão concluídos.
