@@ -5,13 +5,22 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.SpringDocUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 @Configuration
 public class ConfiguracaoOpenApi {
 
     private static final String ESQUEMA_JWT = "bearerAuth";
+
+    static {
+        // Sem isto o springdoc documenta o `@AuthenticationPrincipal Long usuarioId` dos
+        // controllers como query param obrigatorio. O valor vem do token, nunca da URL —
+        // e o schema publicado mandaria o frontend enviar o id do usuario na query string.
+        SpringDocUtils.getConfig().addAnnotationsToIgnore(AuthenticationPrincipal.class);
+    }
 
     @Bean
     public OpenAPI documentacaoDaApi() {

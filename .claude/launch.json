@@ -1,0 +1,16 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "clareza-web",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "C:/Users/pedro.haugusto/Desktop/projetos/clareza-web",
+        "run",
+        "start"
+      ],
+      "port": 4200
+    }
+  ]
+}
