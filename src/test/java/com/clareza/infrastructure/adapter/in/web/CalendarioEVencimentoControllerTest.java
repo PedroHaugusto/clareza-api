@@ -93,7 +93,7 @@ class CalendarioEVencimentoControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("sem mes e ano o calendario usa o mes corrente")
     void deveUsarOMesAtualPorPadrao() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
 
         mockMvc.perform(get("/api/calendario").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
@@ -112,7 +112,7 @@ class CalendarioEVencimentoControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("vencimentos trazem os proximos 14 dias e tambem o que ja venceu")
     void deveListarVencimentosIncluindoAtrasados() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
         criar("Atrasada", "50.00", "DESPESA", hoje.minusDays(5));
         criar("Vence hoje", "60.00", "DESPESA", hoje);
         criar("Vence em 14 dias", "70.00", "DESPESA", hoje.plusDays(14));
@@ -129,7 +129,7 @@ class CalendarioEVencimentoControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("o que ja foi confirmado sai da lista de vencimentos")
     void naoDeveListarOQueJaFoiConfirmado() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
         Long id = criar("Ja paga", "50.00", "DESPESA", hoje.plusDays(2));
         criar("A pagar", "60.00", "DESPESA", hoje.plusDays(3));
 
@@ -144,7 +144,7 @@ class CalendarioEVencimentoControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("calendario e vencimentos so mostram dados do proprio usuario")
     void deveIsolarPorUsuario() throws Exception {
-        criar("Aluguel", "1200.00", "DESPESA", LocalDate.now().plusDays(2));
+        criar("Aluguel", "1200.00", "DESPESA", hoje().plusDays(2));
 
         String outro = mockMvc.perform(post("/api/auth/registrar")
                         .contentType(MediaType.APPLICATION_JSON)

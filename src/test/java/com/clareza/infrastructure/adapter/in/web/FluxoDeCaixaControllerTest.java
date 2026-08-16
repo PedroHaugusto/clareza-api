@@ -65,7 +65,7 @@ class FluxoDeCaixaControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("o fluxo mistura passado realizado e futuro previsto, acumulando o saldo")
     void deveAcumularPassadoEFuturo() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
         LocalDate mesPassado = hoje.minusMonths(1).withDayOfMonth(10);
         LocalDate mesQueVem = hoje.plusMonths(1).withDayOfMonth(10);
 
@@ -95,7 +95,7 @@ class FluxoDeCaixaControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("o que ficou fora da janela vira saldo anterior, e nao some da conta")
     void deveTrazerOSaldoAnteriorAJanela() throws Exception {
-        LocalDate antigo = LocalDate.now().minusMonths(5).withDayOfMonth(10);
+        LocalDate antigo = hoje().minusMonths(5).withDayOfMonth(10);
         criar("Heranca", "10000.00", "RECEITA", antigo, antigo);
 
         mockMvc.perform(get("/api/fluxo-caixa")
@@ -108,7 +108,7 @@ class FluxoDeCaixaControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("mes deficitario aparece com saldo negativo")
     void deveMostrarSaldoNegativo() throws Exception {
-        LocalDate mesQueVem = LocalDate.now().plusMonths(1).withDayOfMonth(10);
+        LocalDate mesQueVem = hoje().plusMonths(1).withDayOfMonth(10);
         criar("Compra grande", "1500.00", "DESPESA", mesQueVem, null);
 
         mockMvc.perform(get("/api/fluxo-caixa")
@@ -133,7 +133,7 @@ class FluxoDeCaixaControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("o fluxo nao enxerga lancamento de outro usuario")
     void deveIsolarPorUsuario() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
         criar("Salario", "5000.00", "RECEITA", hoje.withDayOfMonth(1), hoje.withDayOfMonth(1));
 
         String outro = mockMvc.perform(post("/api/auth/registrar")

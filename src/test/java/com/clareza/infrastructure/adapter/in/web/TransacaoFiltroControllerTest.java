@@ -59,11 +59,11 @@ class TransacaoFiltroControllerTest extends TesteDeIntegracao {
         categoriaId = objectMapper.readTree(categorias).get(0).get("id").asLong();
         outraCategoriaId = objectMapper.readTree(categorias).get(1).get("id").asLong();
 
-        criar("Conta de luz", "150.00", "DESPESA", LocalDate.now().plusDays(5), contaId, categoriaId);
-        criar("Salario", "5000.00", "RECEITA", LocalDate.now().plusDays(10), contaId, categoriaId);
-        criar("Luz do escritorio", "90.00", "DESPESA", LocalDate.now().plusDays(60),
+        criar("Conta de luz", "150.00", "DESPESA", hoje().plusDays(5), contaId, categoriaId);
+        criar("Salario", "5000.00", "RECEITA", hoje().plusDays(10), contaId, categoriaId);
+        criar("Luz do escritorio", "90.00", "DESPESA", hoje().plusDays(60),
                 outraContaId, outraCategoriaId);
-        criar("Antiga", "10.00", "DESPESA", LocalDate.now().minusMonths(2), contaId, categoriaId);
+        criar("Antiga", "10.00", "DESPESA", hoje().minusMonths(2), contaId, categoriaId);
     }
 
     @Test
@@ -147,19 +147,19 @@ class TransacaoFiltroControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("confirmar marca a data de efetivacao e muda o status")
     void deveConfirmarLancamento() throws Exception {
-        Long id = criar("Internet", "99.90", "DESPESA", LocalDate.now(), contaId, categoriaId);
+        Long id = criar("Internet", "99.90", "DESPESA", hoje(), contaId, categoriaId);
 
         mockMvc.perform(patch("/api/transacoes/" + id + "/confirmar")
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status", is("CONFIRMADA")))
-                .andExpect(jsonPath("$.dataEfetivacao", is(LocalDate.now().toString())));
+                .andExpect(jsonPath("$.dataEfetivacao", is(hoje().toString())));
     }
 
     @Test
     @DisplayName("confirmar de novo responde 422")
     void deveRecusarConfirmacaoRepetida() throws Exception {
-        Long id = criar("Internet", "99.90", "DESPESA", LocalDate.now(), contaId, categoriaId);
+        Long id = criar("Internet", "99.90", "DESPESA", hoje(), contaId, categoriaId);
 
         mockMvc.perform(patch("/api/transacoes/" + id + "/confirmar")
                 .header("Authorization", "Bearer " + token)).andExpect(status().isOk());
@@ -186,7 +186,7 @@ class TransacaoFiltroControllerTest extends TesteDeIntegracao {
                 .andReturn().getResponse().getContentAsString();
         Long categoriaPropria = objectMapper.readTree(propria).get("id").asLong();
 
-        criar("Racao", "80.00", "DESPESA", LocalDate.now(), contaId, categoriaPropria);
+        criar("Racao", "80.00", "DESPESA", hoje(), contaId, categoriaPropria);
 
         mockMvc.perform(org.springframework.test.web.servlet.request.MockMvcRequestBuilders
                         .delete("/api/categorias/" + categoriaPropria)

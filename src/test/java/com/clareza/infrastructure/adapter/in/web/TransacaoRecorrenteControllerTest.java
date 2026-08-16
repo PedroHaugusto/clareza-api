@@ -64,7 +64,7 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
         mockMvc.perform(post("/api/transacoes-recorrentes")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mensal("Aluguel", "1200.00", 10, LocalDate.now(), null)))
+                        .content(mensal("Aluguel", "1200.00", 10, hoje(), null)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.ativa", is(true)))
                 .andExpect(jsonPath("$.periodicidade", is("MENSAL")));
@@ -80,7 +80,7 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
             assertThat(ocorrencia.get("descricao").asText()).isEqualTo("Aluguel");
             assertThat(ocorrencia.get("valor").asDouble()).isEqualTo(1200.00);
             assertThat(LocalDate.parse(ocorrencia.get("dataPrevista").asText()))
-                    .isAfterOrEqualTo(LocalDate.now());
+                    .isAfterOrEqualTo(hoje());
         }
     }
 
@@ -90,8 +90,8 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
         mockMvc.perform(post("/api/transacoes-recorrentes")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mensal("Curso", "300.00", 5, LocalDate.now(),
-                                LocalDate.now().plusMonths(3))))
+                        .content(mensal("Curso", "300.00", 5, hoje(),
+                                hoje().plusMonths(3))))
                 .andExpect(status().isCreated());
 
         String transacoes = mockMvc.perform(get("/api/transacoes")
@@ -107,7 +107,7 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
         mockMvc.perform(post("/api/transacoes-recorrentes")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mensal("Aluguel", "1200.00", 10, LocalDate.now(), null)))
+                        .content(mensal("Aluguel", "1200.00", 10, hoje(), null)))
                 .andExpect(status().isCreated());
 
         String transacoes = mockMvc.perform(get("/api/transacoes")
@@ -127,7 +127,7 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
         String criada = mockMvc.perform(post("/api/transacoes-recorrentes")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mensal("Academia", "150.00", 10, LocalDate.now(), null)))
+                        .content(mensal("Academia", "150.00", 10, hoje(), null)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         Long recorrenteId = objectMapper.readTree(criada).get("id").asLong();
@@ -161,7 +161,7 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
         String criada = mockMvc.perform(post("/api/transacoes-recorrentes")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mensal("Academia", "150.00", 10, LocalDate.now(), null)))
+                        .content(mensal("Academia", "150.00", 10, hoje(), null)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         Long recorrenteId = objectMapper.readTree(criada).get("id").asLong();
@@ -180,7 +180,7 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
         String corpo = String.format(
                 "{\"contaId\":%d,\"categoriaId\":%d,\"descricao\":\"Feira\",\"valor\":120.00,"
                         + "\"tipo\":\"DESPESA\",\"periodicidade\":\"SEMANAL\",\"dataInicio\":\"%s\"}",
-                contaId, categoriaId, LocalDate.now());
+                contaId, categoriaId, hoje());
 
         mockMvc.perform(post("/api/transacoes-recorrentes")
                         .header("Authorization", "Bearer " + token)
@@ -195,7 +195,7 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
         mockMvc.perform(post("/api/transacoes-recorrentes")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mensal("Aluguel", "1200.00", 45, LocalDate.now(), null)))
+                        .content(mensal("Aluguel", "1200.00", 45, hoje(), null)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.campos[0].campo", is("diaDoMes")));
     }
@@ -206,7 +206,7 @@ class TransacaoRecorrenteControllerTest extends TesteDeIntegracao {
         String criada = mockMvc.perform(post("/api/transacoes-recorrentes")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(mensal("Academia", "150.00", 10, LocalDate.now(), null)))
+                        .content(mensal("Academia", "150.00", 10, hoje(), null)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         Long recorrenteId = objectMapper.readTree(criada).get("id").asLong();

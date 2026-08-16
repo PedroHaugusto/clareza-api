@@ -41,7 +41,7 @@ class TransacaoControllerTest extends TesteDeIntegracao {
                         .header("Authorization", "Bearer " + contexto.token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(corpo(contexto, "Conta de luz", "150.00",
-                                LocalDate.now().plusDays(5), null)))
+                                hoje().plusDays(5), null)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.descricao", is("Conta de luz")))
                 .andExpect(jsonPath("$.valor", is(150.00)))
@@ -62,7 +62,7 @@ class TransacaoControllerTest extends TesteDeIntegracao {
                         .header("Authorization", "Bearer " + contexto.token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(corpo(contexto, "Aluguel atrasado", "1200.00",
-                                LocalDate.now().minusDays(3), null)))
+                                hoje().minusDays(3), null)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status", is("ATRASADA")));
     }
@@ -76,7 +76,7 @@ class TransacaoControllerTest extends TesteDeIntegracao {
                         .header("Authorization", "Bearer " + contexto.token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(corpo(contexto, "Salario", "5000.00",
-                                LocalDate.now().minusDays(2), LocalDate.now().minusDays(2))))
+                                hoje().minusDays(2), hoje().minusDays(2))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.status", is("CONFIRMADA")));
     }
@@ -89,7 +89,7 @@ class TransacaoControllerTest extends TesteDeIntegracao {
         mockMvc.perform(post("/api/transacoes")
                         .header("Authorization", "Bearer " + contexto.token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo(contexto, "Errado", "-50.00", LocalDate.now(), null)))
+                        .content(corpo(contexto, "Errado", "-50.00", hoje(), null)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.campos[0].campo", is("valor")));
     }
@@ -103,7 +103,7 @@ class TransacaoControllerTest extends TesteDeIntegracao {
         String corpoComContaAlheia = String.format(
                 "{\"contaId\":%d,\"categoriaId\":%d,\"descricao\":\"Invasao\","
                         + "\"valor\":10.00,\"tipo\":\"DESPESA\",\"dataPrevista\":\"%s\"}",
-                daAna.contaId, doBruno.categoriaId, LocalDate.now());
+                daAna.contaId, doBruno.categoriaId, hoje());
 
         mockMvc.perform(post("/api/transacoes")
                         .header("Authorization", "Bearer " + doBruno.token)
@@ -122,7 +122,7 @@ class TransacaoControllerTest extends TesteDeIntegracao {
                         .header("Authorization", "Bearer " + contexto.token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(corpo(contexto, "Conta de luz revisada", "180.50",
-                                LocalDate.now().plusDays(5), null)))
+                                hoje().plusDays(5), null)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(id.intValue())))
                 .andExpect(jsonPath("$.descricao", is("Conta de luz revisada")))
@@ -161,7 +161,7 @@ class TransacaoControllerTest extends TesteDeIntegracao {
         mockMvc.perform(put("/api/transacoes/" + id)
                         .header("Authorization", "Bearer " + doBruno.token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo(doBruno, "Sequestrada", "1.00", LocalDate.now(), null)))
+                        .content(corpo(doBruno, "Sequestrada", "1.00", hoje(), null)))
                 .andExpect(status().isNotFound());
     }
 
@@ -197,7 +197,7 @@ class TransacaoControllerTest extends TesteDeIntegracao {
         String resposta = mockMvc.perform(post("/api/transacoes")
                         .header("Authorization", "Bearer " + contexto.token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo(contexto, descricao, valor, LocalDate.now().plusDays(5), null)))
+                        .content(corpo(contexto, descricao, valor, hoje().plusDays(5), null)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
         JsonNode json = objectMapper.readTree(resposta);

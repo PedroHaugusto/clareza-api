@@ -1,10 +1,14 @@
 package com.clareza;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.DockerImageName;
+
+import java.time.Clock;
+import java.time.LocalDate;
 
 /**
  * Base dos testes que precisam do banco real. O container e iniciado uma unica vez por JVM e
@@ -22,6 +26,18 @@ public abstract class TesteDeIntegracao {
 
     static {
         POSTGRES.start();
+    }
+
+    /**
+     * O mesmo relogio que a aplicacao usa para decidir o que e "hoje". Montar cenario com
+     * LocalDate.now() faria o teste discordar da aplicacao sempre que a JVM estivesse em outro
+     * fuso — foi o que quebrou a suite no runner do CI, que roda em UTC.
+     */
+    @Autowired
+    private Clock relogio;
+
+    protected LocalDate hoje() {
+        return LocalDate.now(relogio);
     }
 
     @DynamicPropertySource

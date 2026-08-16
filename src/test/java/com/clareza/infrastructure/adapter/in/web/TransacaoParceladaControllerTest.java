@@ -64,7 +64,7 @@ class TransacaoParceladaControllerTest extends TesteDeIntegracao {
         String resposta = mockMvc.perform(post("/api/transacoes/parcelada")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo("Geladeira", "1200.00", 3, LocalDate.now().plusDays(10))))
+                        .content(corpo("Geladeira", "1200.00", 3, hoje().plusDays(10))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$", hasSize(3)))
                 .andExpect(jsonPath("$[*].numeroParcela", contains(1, 2, 3)))
@@ -85,7 +85,7 @@ class TransacaoParceladaControllerTest extends TesteDeIntegracao {
         String resposta = mockMvc.perform(post("/api/transacoes/parcelada")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo("Curso", "100.00", 3, LocalDate.now())))
+                        .content(corpo("Curso", "100.00", 3, hoje())))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$[0].valor", is(33.33)))
                 .andExpect(jsonPath("$[1].valor", is(33.33)))
@@ -119,7 +119,7 @@ class TransacaoParceladaControllerTest extends TesteDeIntegracao {
         mockMvc.perform(post("/api/transacoes/parcelada")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo("Geladeira", "1200.00", 3, LocalDate.now())))
+                        .content(corpo("Geladeira", "1200.00", 3, hoje())))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/transacoes").header("Authorization", "Bearer " + token))
@@ -136,7 +136,7 @@ class TransacaoParceladaControllerTest extends TesteDeIntegracao {
         mockMvc.perform(post("/api/transacoes/parcelada")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo("Geladeira", "1200.00", 1, LocalDate.now())))
+                        .content(corpo("Geladeira", "1200.00", 1, hoje())))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.campos[0].campo", is("totalParcelas")));
     }
@@ -147,7 +147,7 @@ class TransacaoParceladaControllerTest extends TesteDeIntegracao {
         mockMvc.perform(post("/api/transacoes/parcelada")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo("Bala", "0.02", 3, LocalDate.now())))
+                        .content(corpo("Bala", "0.02", 3, hoje())))
                 .andExpect(status().isUnprocessableEntity());
     }
 
@@ -156,7 +156,7 @@ class TransacaoParceladaControllerTest extends TesteDeIntegracao {
     void deveExigirAutenticacao() throws Exception {
         mockMvc.perform(post("/api/transacoes/parcelada")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(corpo("Geladeira", "1200.00", 3, LocalDate.now())))
+                        .content(corpo("Geladeira", "1200.00", 3, hoje())))
                 .andExpect(status().isUnauthorized());
     }
 

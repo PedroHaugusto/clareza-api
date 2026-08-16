@@ -84,7 +84,7 @@ class MetaFinanceiraControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("prazo futuro devolve os dias restantes e nao marca atraso")
     void deveCalcularOsDiasAtePrazo() throws Exception {
-        LocalDate prazo = LocalDate.now().plusDays(30);
+        LocalDate prazo = hoje().plusDays(30);
 
         mockMvc.perform(post("/api/metas")
                         .header("Authorization", "Bearer " + token)
@@ -99,7 +99,7 @@ class MetaFinanceiraControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("prazo passado com meta aberta marca atraso com dias negativos")
     void prazoPassadoDeveMarcarAtraso() throws Exception {
-        LocalDate prazo = LocalDate.now().minusDays(5);
+        LocalDate prazo = hoje().minusDays(5);
 
         mockMvc.perform(post("/api/metas")
                         .header("Authorization", "Bearer " + token)
@@ -113,7 +113,7 @@ class MetaFinanceiraControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("meta concluida nao aparece vencida mesmo com prazo passado")
     void metaConcluidaNaoDeveAparecerVencida() throws Exception {
-        LocalDate prazo = LocalDate.now().minusDays(5);
+        LocalDate prazo = hoje().minusDays(5);
 
         mockMvc.perform(post("/api/metas")
                         .header("Authorization", "Bearer " + token)

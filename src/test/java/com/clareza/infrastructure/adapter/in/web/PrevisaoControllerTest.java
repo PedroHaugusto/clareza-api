@@ -119,7 +119,7 @@ class PrevisaoControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("os tres cenarios projetam saldos diferentes sobre os mesmos lancamentos")
     void osCenariosDevemDivergir() throws Exception {
-        LocalDate mesQueVem = LocalDate.now().plusMonths(1).withDayOfMonth(5);
+        LocalDate mesQueVem = hoje().plusMonths(1).withDayOfMonth(5);
         criar("Salario", "5000.00", "RECEITA", mesQueVem);
         criar("Aluguel", "2000.00", "DESPESA", mesQueVem);
 
@@ -148,7 +148,7 @@ class PrevisaoControllerTest extends TesteDeIntegracao {
                         .content("{\"percentualAjusteReceita\":10,\"percentualAjusteDespesa\":10}"))
                 .andExpect(status().isOk());
 
-        LocalDate mesQueVem = LocalDate.now().plusMonths(1).withDayOfMonth(5);
+        LocalDate mesQueVem = hoje().plusMonths(1).withDayOfMonth(5);
         criar("Salario", "5000.00", "RECEITA", mesQueVem);
 
         mockMvc.perform(get("/api/previsao")
@@ -171,7 +171,7 @@ class PrevisaoControllerTest extends TesteDeIntegracao {
                         .content("{\"percentualAjusteReceita\":30,\"percentualAjusteDespesa\":30}"))
                 .andExpect(status().isOk());
 
-        LocalDate mesQueVem = LocalDate.now().plusMonths(1).withDayOfMonth(5);
+        LocalDate mesQueVem = hoje().plusMonths(1).withDayOfMonth(5);
         criar("Salario", "1000.00", "RECEITA", mesQueVem);
 
         mockMvc.perform(get("/api/previsao").param("cenario", "PESSIMISTA")
@@ -183,7 +183,7 @@ class PrevisaoControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("o saldo projetado de um mes abre o mes seguinte")
     void deveEncadearOsSaldos() throws Exception {
-        LocalDate mesQueVem = LocalDate.now().plusMonths(1).withDayOfMonth(5);
+        LocalDate mesQueVem = hoje().plusMonths(1).withDayOfMonth(5);
         criar("Salario", "1000.00", "RECEITA", mesQueVem);
 
         String resposta = mockMvc.perform(get("/api/previsao").param("cenario", "PROVAVEL")
@@ -198,7 +198,7 @@ class PrevisaoControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("a previsao nao enxerga lancamento de outro usuario")
     void deveIsolarPorUsuario() throws Exception {
-        criar("Salario", "5000.00", "RECEITA", LocalDate.now().plusMonths(1).withDayOfMonth(5));
+        criar("Salario", "5000.00", "RECEITA", hoje().plusMonths(1).withDayOfMonth(5));
 
         String outro = mockMvc.perform(post("/api/auth/registrar")
                         .contentType(MediaType.APPLICATION_JSON)

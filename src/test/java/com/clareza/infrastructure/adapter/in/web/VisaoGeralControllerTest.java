@@ -57,7 +57,7 @@ class VisaoGeralControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("visao geral separa realizado de previsto e projeta os proximos meses")
     void deveMontarAVisaoGeral() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
         LocalDate inicioDoMes = hoje.withDayOfMonth(1);
 
         criar("Salario", "5000.00", "RECEITA", inicioDoMes, inicioDoMes);
@@ -80,7 +80,7 @@ class VisaoGeralControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("o lancamento do mes que vem nao entra no saldo disponivel")
     void oMesSeguinteNaoDeveEntrarNoSaldo() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
         criar("Salario", "1000.00", "RECEITA", hoje.withDayOfMonth(1), hoje.withDayOfMonth(1));
         criar("Compra futura", "900.00", "DESPESA", hoje.plusMonths(1).withDayOfMonth(10), null);
 
@@ -92,7 +92,7 @@ class VisaoGeralControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("saldo-disponivel devolve os dois saldos")
     void deveDevolverOSaldoNoEndpointProprio() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
         criar("Salario", "2000.00", "RECEITA", hoje.withDayOfMonth(1), hoje.withDayOfMonth(1));
         criar("Conta a pagar", "500.00", "DESPESA", hoje.withDayOfMonth(hoje.lengthOfMonth()), null);
 
@@ -114,7 +114,7 @@ class VisaoGeralControllerTest extends TesteDeIntegracao {
     @Test
     @DisplayName("a visao geral nao enxerga lancamento de outro usuario")
     void deveIsolarPorUsuario() throws Exception {
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje = hoje();
         criar("Salario", "5000.00", "RECEITA", hoje.withDayOfMonth(1), hoje.withDayOfMonth(1));
 
         String outro = mockMvc.perform(post("/api/auth/registrar")
