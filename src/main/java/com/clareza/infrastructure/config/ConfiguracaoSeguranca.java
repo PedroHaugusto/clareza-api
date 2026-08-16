@@ -17,6 +17,10 @@ import org.springframework.web.cors.CorsConfigurationSource;
 @RequiredArgsConstructor
 public class ConfiguracaoSeguranca {
 
+    private static final String[] DOCUMENTACAO = {
+            "/v3/api-docs", "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**"
+    };
+
     private final FiltroDeAutenticacaoJwt filtroDeAutenticacaoJwt;
     private final PontoDeEntradaNaoAutorizado pontoDeEntradaNaoAutorizado;
     private final CorsConfigurationSource corsConfigurationSource;
@@ -32,8 +36,11 @@ public class ConfiguracaoSeguranca {
                 .exceptionHandling().authenticationEntryPoint(pontoDeEntradaNaoAutorizado)
                 .and()
                 .authorizeRequests()
-                .antMatchers("/api/auth/**").permitAll()
+                // Rotas de entrada listadas uma a uma: com /api/auth/** qualquer rota nova
+                // sob esse prefixo nasceria publica sem ninguem perceber.
+                .antMatchers("/api/auth/registrar", "/api/auth/login", "/api/auth/google").permitAll()
                 .antMatchers("/actuator/health").permitAll()
+                .antMatchers(DOCUMENTACAO).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilterBefore(filtroDeAutenticacaoJwt, UsernamePasswordAuthenticationFilter.class);

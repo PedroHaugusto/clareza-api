@@ -51,6 +51,16 @@ clareza:
     # Lista separada por virgula. Em producao, a origem do frontend na Vercel/Cloudflare Pages.
     origens-permitidas: ${CORS_ALLOWED_ORIGINS:http://localhost:4200}
 
+springdoc:
+  # Desligue em producao com SWAGGER_ENABLED=false se nao quiser a API documentada em publico.
+  api-docs:
+    enabled: ${SWAGGER_ENABLED:true}
+  swagger-ui:
+    enabled: ${SWAGGER_ENABLED:true}
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
 server:
   port: ${PORT:8080}
   shutdown: graceful

@@ -30,6 +30,8 @@
         <postgresql.version>42.7.4</postgresql.version>
         <jjwt.version>0.11.5</jjwt.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
+        <!-- Linha 1.x do springdoc: a 2.x exige Spring Boot 3 e Java 17. -->
+        <springdoc.version>1.7.0</springdoc.version>
         <testcontainers.version>1.19.8</testcontainers.version>
     </properties>
 
@@ -91,6 +93,12 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>${mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>${springdoc.version}</version>
         </dependency>
 
         <dependency>
